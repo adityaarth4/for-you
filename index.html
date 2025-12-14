@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <style>
+        :root {
+            --bg-color: #1a0a2e;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --accent-pink: #ff4d8d;
+            --text-white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: linear-gradient(to bottom, #1a0a2e, #3d1a5a);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-white);
+        }
+
+        /* Background Animation */
+        .bubbles {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: move 10s linear infinite;
+        }
+
+        @keyframes move {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Container & Transitions */
+        .container {
+            z-index: 10;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .screen { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .screen.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Step 1: Envelope */
+        .envelope-wrapper { cursor: pointer; transition: transform 0.3s; }
+        .envelope-wrapper:hover { transform: scale(1.1); }
+        .envelope { font-size: 80px; margin-bottom: 20px; }
+        .btn-buka {
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 141, 0.4);
+        }
+
+        /* Step 2: Hello Message */
+        .letter-box {
+            background: #fff;
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+        }
+        .letter-box h2 { color: var(--accent-pink); margin-bottom: 10px; }
+
+        /* Step 3: PIN Pad */
+        .pin-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .pin-dots { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .dot { width: 15px; height: 15px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+        .dot.filled { background: var(--accent-pink); box-shadow: 0 0 10px var(--accent-pink); }
+        .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .pin-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .pin-btn:active { background: var(--accent-pink); }
+        .pin-msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
+
+        /* Step 4: Memory Game */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .card {
+            aspect-ratio: 1/1;
+            background: var(--card-bg);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
+            transform-style: preserve-3d; 
+        }
+        .card.flipped { 
+            background: white; 
+            color: black; 
+            transform: rotateY(180deg); 
+            pointer-events: none;
+        }
+        
+        /* Step 5: Final Message */
+        .final-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            line-height: 1.6;
+            text-align: left;
+            padding-bottom: 30px; 
+        } 
+        /* Gambar tanpa lis putih */
+        .panda-img { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            margin: 0 auto 20px; 
+            display: block; 
+            object-fit: cover;
+        }
+
+        /* --- TYPING EFFECT CSS --- */
+        .typing-text {
+            overflow: hidden; 
+            white-space: nowrap; 
+            margin: 0;
+            display: block; 
+            padding-right: 5px; 
+            min-height: 1.6em; 
+            line-height: 1.6;
+        }
+        
+        .typing-text.final-line {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Animasi kursor berkedip (Tetap didefinisikan, tetapi tidak digunakan di JS) */
+        .typing-cursor {
+            border-right: .15em solid var(--accent-pink);
+            animation: 
+                blink-caret .75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--accent-pink) }
+        }
+        /* --- END TYPING EFFECT CSS --- */
+
+    </style>
+</head>
+<body>
+
+    <div class="bubbles" id="bubbleContainer"></div>
+
+    <div class="container">
+        <div id="step1" class="screen active">
+            <div class="envelope-wrapper" onclick="goToStep(2)">
+                <div class="envelope">✉️</div>
+                <button class="btn-buka">Buka</button>
+            </div>
+        </div>
+
+        <div id="step2" class="screen">
+            <div class="letter-box" onclick="goToStep(3)">
+                <h2>Aloo Kamu.. 🥳💖</h2>
+                <p>Klik di sini untuk lanjut ya!</p>
+            </div>
+        </div>
+
+        <div id="step3" class="screen">
+            <div class="pin-container">
+                <h3>Masukin PIN dulu yaa! 🫣</h3>
+                <p style="font-size: 12px; margin-bottom: 10px;">Clue: Tanggal & bulan jadian kita (DDMM)</p>
+                <div class="pin-dots" id="pinDots">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <div class="pin-grid">
+                    <button class="pin-btn" onclick="pressPin(1)">1</button>
+                    <button class="pin-btn" onclick="pressPin(2)">2</button>
+                    <button class="pin-btn" onclick="pressPin(3)">3</button>
+                    <button class="pin-btn" onclick="pressPin(4)">4</button>
+                    <button class="pin-btn" onclick="pressPin(5)">5</button>
+                    <button class="pin-btn" onclick="pressPin(6)">6</button>
+                    <button class="pin-btn" onclick="pressPin(7)">7</button>
+                    <button class="pin-btn" onclick="pressPin(8)">8</button>
+                    <button class="pin-btn" onclick="pressPin(9)">9</button>
+                    <button class="pin-btn" style="grid-column: span 3" onclick="pressPin(0)">0</button>
+                </div>
+                <div id="pinMsg" class="pin-msg"></div>
+            </div>
+        </div>
+
+        <div id="step4" class="screen">
+            <h3>Memory Game 😁💖</h3>
+            <p>Cocokkan kartu-kartu ini yaa! 😆👊</p>
+            <div class="memory-grid" id="memoryGrid"></div>
+        </div>
+
+        <div id="step5" class="screen">
+            <div class="final-card">
+                <img src="sayang.jpeg" alt="sayang" class="panda-img">
+                <p><span id="line1" class="typing-text"></span></p>
+                <br>
+                <p><span id="line2" class="typing-text"></span></p>
+                <p><span id="line3" class="typing-text"></span></p>
+                <p><span id="line4" class="typing-text"></span></p>
+                <br>
+                <p><span id="line5" class="typing-text"></span></p>
+                <p><span id="line6" class="typing-text final-line"></span></p>
+                <br>
+                <p><span id="line7" class="typing-text"></span></p>
+                <p><span id="line8" class="typing-text"></span></p> </div>
+        </div>
+    </div>
+
+    <script>
+        // Background Bubbles
+        const bubbleContainer = document.getElementById('bubbleContainer');
+        for (let i = 0; i < 15; i++) {
+            const b = document.createElement('div');
+            b.className = 'bubble';
+            const size = Math.random() * 40 + 10 + 'px';
+            b.style.width = size;
+            b.style.height = size;
+            b.style.left = Math.random() * 100 + '%';
+            b.style.animationDelay = Math.random() * 5 + 's';
+            b.style.animationDuration = Math.random() * 5 + 7 + 's';
+            bubbleContainer.appendChild(b);
+        }
+
+        // Navigation
+        function goToStep(n) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + n).classList.add('active');
+            if(n === 4) initMemoryGame();
+            if(n === 5) startTypingEffect();
+        }
+
+        // --- TYPING EFFECT LOGIC (DIHILANGKAN CURSOR) ---
+        function typeWriter(textElementId, textContent, delay) {
+            return new Promise(resolve => {
+                const element = document.getElementById(textElementId);
+                const fullText = textContent;
+                let i = 0;
+
+                element.innerHTML = ''; 
+                // BARIS INI DIHAPUS/DINONAKTIFKAN: element.classList.add('typing-cursor'); 
+                
+                // Atur white-space: nowrap kembali untuk efek mengetik
+                element.style.whiteSpace = 'nowrap';
+                
+                function type() {
+                    if (i < fullText.length) {
+                        
+                        // Logika untuk menangani tag HTML (seperti <b> atau </b>)
+                        if (fullText.substring(i, i + 3) === '<b>') {
+                            element.insertAdjacentHTML('beforeend', '<b>');
+                            i += 3;
+                        } else if (fullText.substring(i, i + 4) === '</b>') {
+                            element.insertAdjacentHTML('beforeend', '</b>');
+                            i += 4;
+                        } else {
+                            element.insertAdjacentText('beforeend', fullText.charAt(i));
+                            i++;
+                        }
+                        
+                        setTimeout(type, delay);
+                    } else {
+                        // BARIS INI DIHAPUS/DINONAKTIFKAN: element.classList.remove('typing-cursor');
+                        
+                        // Hapus 'white-space: nowrap' agar teks bisa wrap (tidak terpotong)
+                        element.style.whiteSpace = 'normal'; 
+                        
+                        resolve(); 
+                    }
+                }
+                
+                type(); 
+            });
+        }
+
+        async function startTypingEffect() {
+            const delayPerChar = 50; 
+            const delayBetweenLines = 1000; 
+            
+            const correctedMessageLines = [
+                "Sekarang, aku cuma mau bilang ❤️", // line1
+                "Menurut biologi kamu adalah <b>7% darah</b>,", // line2
+                "Menurut kimia kamu adalah <b>70% air</b>,", // line3
+                "Menurut fisika kamu adalah <b>99% ruang hampa</b>,", // line4
+                "Tapi menurut aku, kamu adalah", // line5
+                "<b>100% kesayangankuuu</b> 😘💖", // line6 (final-line)
+                "Lopyuu cantikku, sayangkuu, terlucuu,", // line7
+                "terimutt, sehat terus yaa sayangg ❤️❤️❤️" // line8
+            ];
+
+
+            for (let i = 0; i < correctedMessageLines.length; i++) {
+                const elementId = `line${i + 1}`; 
+                
+                if (document.getElementById(elementId)) {
+                    await typeWriter(elementId, correctedMessageLines[i], delayPerChar);
+                }
+                
+                if (i < correctedMessageLines.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, delayBetweenLines));
+                }
+            }
+        }
+        // --- END TYPING EFFECT LOGIC (DIHILANGKAN CURSOR) ---
+
+        // PIN Logic
+        let currentPin = "";
+        const targetPin = "2505";
+        function pressPin(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updateDots();
+                if (currentPin.length === 4) {
+                    if (currentPin === targetPin) {
+                        document.getElementById('pinMsg').innerHTML = "yeayy benarr ❤️";
+                        setTimeout(() => goToStep(4), 1500);
+                    } else {
+                        document.getElementById('pinMsg').innerHTML = "salahh, coba lagi! 😋";
+                        setTimeout(() => {
+                            currentPin = "";
+                            updateDots();
+                            document.getElementById('pinMsg').innerHTML = "";
+                        }, 1000);
+                    }
+                }
+            }
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((d, i) => {
+                if (i < currentPin.length) d.classList.add('filled');
+                else d.classList.remove('filled');
+            });
+        }
+
+        // Memory Game Logic
+        const emojis = ['💖', '🌸', '✨', '🐱', '🎀', '🍦'];
+        let cards = [...emojis, ...emojis];
+        let flippedCards = [];
+        let matchedCount = 0;
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            flippedCards = [];
+            matchedCount = 0;
+            
+            cards.sort(() => Math.random() - 0.5);
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.innerText = card.dataset.emoji;
+                card.classList.add('flipped');
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 600);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = flippedCards;
+            if (c1.dataset.emoji === c2.dataset.emoji) {
+                c1.style.pointerEvents = 'none'; 
+                c2.style.pointerEvents = 'none';
+                
+                matchedCount++;
+                if (matchedCount === emojis.length) {
+                    setTimeout(() => goToStep(5), 1000);
+                }
+            } else {
+                c1.style.pointerEvents = 'auto'; 
+                c2.style.pointerEvents = 'auto'; 
+                
+                c1.innerText = '';
+                c1.classList.remove('flipped');
+                c2.innerText = '';
+                c2.classList.remove('flipped');
+            }
+            flippedCards = [];
+        }
+    </script>
+</body>
+</html>
